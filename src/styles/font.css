@@ -1,0 +1,81 @@
+@font-face {
+    font-family: "Figtree-Black";
+    font-weight: 900;
+    src: url("/fonts/Figtree-Black.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-BlackItalic";
+    font-style: italic;
+    font-weight: 900;
+    src: url("/fonts/Figtree-BlackItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-ExtraBold";
+    font-weight: 800;
+    src: url("/fonts/Figtree-ExtraBold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-ExtraBoldItalic";
+    font-style: italic;
+    font-weight: 800;
+    src: url("/fonts/Figtree-ExtraBoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-Bold";
+    font-style: normal;
+    font-weight: 700;
+    src: url("/fonts/Figtree-Bold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-BoldItalic";
+    font-style: italic;
+    font-weight: 700;
+    src: url("/fonts/Figtree-BoldItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-Medium";
+    font-style: normal;
+    font-weight: 600;
+    src: url("/fonts/Figtree-Medium.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-MediumItalic";
+    font-style: italic;
+    font-weight: 600;
+    src: url("/fonts/Figtree-MediumItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-Regular";
+    font-style: normal;
+    font-weight: 500;
+    src: url("/fonts/Figtree-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-Italic";
+    font-style: italic;
+    font-weight: 500;
+    src: url("/fonts/Figtree-Italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-Light";
+    font-style: normal;
+    font-weight: 400;
+    src: url("/fonts/Figtree-Light.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "Figtree-LightItalic";
+    font-style: italic;
+    font-weight: 400;
+    src: url("/fonts/Figtree-LightItalic.ttf") format("truetype");
+}

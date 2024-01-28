@@ -1,0 +1,125 @@
+@import "./color.css";
+@import "./font.css";
+@import "./tailwind.css";
+
+html {
+    color: black;
+}
+
+body {
+    font-family: "Figtree-Medium", "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+}
+
+h1 {
+    font-family: "Figtree-ExtraBold", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    text-transform: capitalize;
+}
+
+h2 {
+    font-family: "Figtree-ExtraBold", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-transform: capitalize;
+}
+
+h3 {
+    font-family: "Figtree-Medium", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    font-size: 1.4rem;
+    text-transform: capitalize;
+}
+
+h4 {
+    font-family: "Figtree-Medium", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    font-size: 1.3rem;
+    text-transform: capitalize;
+}
+
+h5 {
+    font-family: "Figtree-ExtraBold", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 300;
+    font-size: 1.2rem;
+    text-transform: capitalize;
+}
+
+h6 {
+    font-family: "Figtree-Medium", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+}
+
+p,
+label {
+    font-family: "Figtree-Light", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    text-transform: none;
+}
+
+a,
+span,
+div,
+section,
+article {
+    font-family: "Figtree-Medium", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+}
+
+em,
+i {
+    font-style: italic;
+}
+
+strong,
+b {
+    font-weight: bold;
+}
+
+a {
+    font-weight: 400; /* Change as needed */
+}
+
+button,
+input[type="button"],
+input[type="submit"] {
+    font-family: "Figtree-Medium", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 500;
+    text-transform: capitalize;
+    color: unset;
+}
+
+small,
+.caption {
+    font-family: "Figtree-Light", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 300;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    display: none;
+}
+
+input,
+select {
+    background: transparent;
+    outline: none;
+}
+
+.MuiButton-outlined {
+    border-width: 2px !important;
+}
+
+::placeholder {
+    color: inherit;
+    font-weight: 400;
+    opacity: 1; /* Firefox */
+}
+
+::-ms-input-placeholder {
+    /* Edge 12 -18 */
+    color: inherit;
+}

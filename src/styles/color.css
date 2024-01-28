@@ -1,0 +1,11 @@
+:root {
+    --primary-color-1000: #51b8f2;
+
+    --box-shadow-bs: inset 0px 0px 1px 1px #cbced6;
+    --box-shadow-bs3: 0px 4px 4px 0px #0000003f;
+    --box-shadow-bs1: 0px 2px 8px 0px #00000019;
+    --box-shadow-bs2: 0px 10px 20px 0px #00000026;
+
+    --background-image-gradient: linear-gradient(0deg, #000000, #00000000);
+    --background-image-gradient1: linear-gradient(180deg, #000000a5, #c4c4c400);
+}
