@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import stringRepresentation from "../../pages/Blueprints/ReactComponentTypescriptBlueprint";
 import { ZipAFolder } from "zip-a-folder";
+import { crypto } from "next/dist/compiled/@edge-runtime/primitives";
 
 const placeholderKey = "bazengaDaddy";
 const placeholderValue = "bazengaMammi";
@@ -14,6 +15,9 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
     promises.push(async () => {
       const text = await file.text();
       stringSVGs.push(text);
+      return new Promise((resolve) => {
+        resolve();
+      });
     });
   }
   await Promise.all(promises);
@@ -50,9 +54,14 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
           .stringify(t)
           .replace(`${placeholderKey}="${placeholderValue}"`, "{...props}"),
       );
+      return new Promise((resolve) => {
+        resolve();
+      });
     });
   }
+  console.log("parsedSVGsPromises: ", parsedSVGsPromises);
   await Promise.all(parsedSVGsPromises);
+  console.log("parsedSVGs: ", parsedSVGs);
   return await createFileResponse(language, parsedSVGs);
 };
 
@@ -80,9 +89,9 @@ const performCleanup = (
       The retry delay is: [${retryDelay}]. We so far have retried this operation: [${totalRetries}] times.`),
   );
   try {
-    if (!fs.existsSync(destinationPath)) {
+    if (fs.existsSync(destinationPath)) {
       console.info(cleanString(`Destination exists. Attempting to delete it.`));
-      fs.rmSync(destinationPath);
+      fs.rmSync(destinationPath, { recursive: true });
     }
   } catch (e) {
     const m = JSON.stringify(e);
@@ -93,12 +102,10 @@ const performCleanup = (
       ),
     );
     const rDelay = retryDelay + retryIncrementValue;
-    setTimeout(() =>
-      performCleanup(
-        destinationPath,
-        rDelay >= maxRetryIncrement ? maxRetryIncrement : rDelay,
-        totalRetries + 1,
-      ),
+    const _rDelay = rDelay >= maxRetryIncrement ? maxRetryIncrement : rDelay;
+    setTimeout(
+      () => performCleanup(destinationPath, _rDelay, totalRetries + 1),
+      _rDelay,
     );
     return { status: false, message: m };
   }
@@ -109,24 +116,24 @@ export const createFileResponse = async (
   svgStrings: string[],
 ): Promise<{ status: boolean; message: string; zipFilePath?: string }> => {
   const array = new Uint8Array(2);
-  const nums = self.crypto.getRandomValues(array);
+  const nums = crypto.getRandomValues(array);
   const directoryName = `${new Date().getTime()}${nums[0]}${nums[1]}`;
-  const destination = `./temp/${directoryName}`;
-  const destinationPath = path.join(destination);
+  const destination = `temp/${directoryName}`;
+  const destinationPath = path.join("./", destination);
 
   // copy boilerplate
   try {
-    const p = `./utils/${language}/`;
-    const files = fs.readdirSync(p);
+    const p = `utils/${language}/`;
+    const files = fs.readdirSync(path.join("./", p));
     console.info(
       `Successfully read files in '${p}'. Starting the copying process.\n`,
     );
 
     if (!fs.existsSync(destinationPath)) {
       console.info(
-        `Destination path ${destinationPath} doesn't existing. Creating directory now.`,
+        `Destination path ${destinationPath} doesn't exist. Creating directory now.`,
       );
-      fs.mkdirSync(destinationPath);
+      fs.mkdirSync(destinationPath, { recursive: true });
     }
     for (const f of files) {
       const source = path.join(p, f);
@@ -137,7 +144,9 @@ export const createFileResponse = async (
     }
   } catch (e) {
     const m = JSON.stringify(e);
-    console.error(`An error occurred. Details: \n (${m} \n. Doing cleanup.`);
+    console.error(
+      `An error occurred. Details: \n (${m} \n ${e} \n. Doing cleanup.`,
+    );
     return {
       status: false,
       message: cleanString(
@@ -154,27 +163,26 @@ export const createFileResponse = async (
   const errors: string[] = [];
   for (let i = 0; i < svgStrings.length; i++) {
     const svg = svgStrings[i];
-    promises.push(async () => {
-      try {
-        const iconName = `IconComponent${i}`;
-        const iconFileName = `${iconName}.${language}x`;
-        const data = new Uint8Array(
-          Buffer.from(stringRepresentation(iconName, svg)),
-        );
-        console.info(cleanString(`Writing file: ${iconFileName}`));
-        fs.writeFile(``, data, (err) => {
-          if (err) {
-            throw err;
-          }
+    promises.push(() => {
+      return new Promise((resolve) => {
+        try {
+          const iconName = `IconComponent${i}`;
+          const iconFileName = `${iconName}.${language}x`;
+          const data = new Uint8Array(
+            Buffer.from(stringRepresentation(iconName, svg)),
+          );
+          console.info(cleanString(`Writing file: ${iconFileName}`));
+          fs.writeFileSync(``, data);
           console.info(`File ${iconFileName} written successfully.`);
-        });
-      } catch (e) {
-        const m = cleanString(
-          `We run into an issue with writing file [${svg}]. Error: \n ${JSON.stringify(e)}\n `,
-        );
-        console.error(m);
-        errors.push(m);
-      }
+        } catch (e) {
+          const m = cleanString(
+            `We run into an issue with writing file [${svg}]. Error: \n ${JSON.stringify(e)}\n `,
+          );
+          console.error(m);
+          errors.push(m);
+        }
+        resolve();
+      });
     });
   }
 
@@ -189,10 +197,13 @@ export const createFileResponse = async (
     };
   }
 
+  //
+
   try {
     const zipFileName = `jsd-${directoryName}.zip`;
-    await ZipAFolder.zip(destinationPath, zipFileName);
-    const zipFilePath = path.join(destinationPath, zipFileName);
+    const zipFilePath = path.join("temp/", zipFileName);
+    console.log("zipFilePath", zipFilePath);
+    await ZipAFolder.zip(destinationPath, zipFilePath, {});
     console.info(
       `File copying complete. Files generated successfully. Zipping folder to [${zipFilePath}].`,
     );

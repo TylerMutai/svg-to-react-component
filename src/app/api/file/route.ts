@@ -12,7 +12,6 @@ export async function POST(request: NextRequest): Promise<Response> {
     const blob = await fs.openAsBlob(res.zipFilePath);
     return new Response(blob, {
       status: 200,
-      statusText: res.message,
       headers: {
         "Content-Type": `application/zip`,
         "Content-Length": `${blob.size}`,
@@ -22,7 +21,6 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   return new Response(JSON.stringify(res), {
     status: 422,
-    statusText: res.message,
     headers: {
       "Content-Type": "application/json",
     },

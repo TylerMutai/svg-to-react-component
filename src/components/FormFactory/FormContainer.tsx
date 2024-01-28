@@ -1,15 +1,13 @@
-import { Alert } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import { MdOutlineCancel } from "react-icons/md";
+import React, { useCallback, useMemo, useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 import FormContext, {
   FormContainerProps,
   FormValidator,
-} from "../../../../utils/contexts/formContext";
-import CustomIcon from "../../icons/CustomIcon";
-import showAlertModal from "../../layout/AlertModal/AlertModal";
+} from "../../utils/contexts/formContext";
 
-function FormContainer<T>(props: Readonly<FormContainerProps<T>>): JSX.Element {
+function FormContainer<T extends FieldValues>(
+  props: Readonly<FormContainerProps<T>>,
+): React.JSX.Element {
   const {
     className = "",
     onSubmit,
@@ -38,12 +36,9 @@ function FormContainer<T>(props: Readonly<FormContainerProps<T>>): JSX.Element {
           }
         });
         if (Object.keys(_errors).length) {
-          showAlertModal({
-            type: "error",
-            title: "Validation Errors",
-            description:
-              "Some errors were encountered when submitting form. Please check then try again.",
-          }).then();
+          alert(
+            "Some errors were encountered when submitting form. Please check then try again.",
+          );
           setErrors(_errors);
           return;
         }
@@ -51,7 +46,7 @@ function FormContainer<T>(props: Readonly<FormContainerProps<T>>): JSX.Element {
       }
       onSubmit(data);
     },
-    [onSubmit, validationOptions]
+    [onSubmit, validationOptions],
   );
   const values = useMemo(
     () => ({
@@ -63,7 +58,7 @@ function FormContainer<T>(props: Readonly<FormContainerProps<T>>): JSX.Element {
       getValues,
       control,
     }),
-    [errors, initialValues, control, register, setValue, watch, getValues]
+    [errors, initialValues, control, register, setValue, watch, getValues],
   );
   return (
     <FormContext.Provider value={values}>
@@ -75,12 +70,9 @@ function FormContainer<T>(props: Readonly<FormContainerProps<T>>): JSX.Element {
         className={className}
       >
         {error ? (
-          <Alert
-            icon={<CustomIcon size="small" as={MdOutlineCancel} />}
-            severity="error"
-          >
+          <div className="flex items-center gap-5 w-full p-7 bg-red-100">
             {error}
-          </Alert>
+          </div>
         ) : null}
         {children}
       </form>

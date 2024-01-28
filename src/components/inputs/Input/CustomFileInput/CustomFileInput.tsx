@@ -30,6 +30,7 @@ const CustomFileInput: FC<CustomFileInputProps> = ({
       <input
         id={filePickerInputId}
         accept={"image/svg+xml"}
+        multiple
         type="file"
         style={{
           visibility: "hidden",

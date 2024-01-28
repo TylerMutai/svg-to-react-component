@@ -35,7 +35,9 @@ const CustomFileInputDisplay = ({
           >
             <div className="flex flex-row items-center justify-between w-full">
               <p className="whitespace-nowrap overflow-clip px-2">{f.name}</p>
-              <CustomButton onClick={() => handleRemove(i)}>X</CustomButton>
+              <CustomButton onClick={() => handleRemove(i)} className="m-2">
+                X
+              </CustomButton>
             </div>
             <div className="w-full h-[4px] bg-[#35A839]" />
           </div>
