@@ -1,0 +1,7 @@
+.idea/
+node_modules
+**/output
+**/dist
+.env
+out/
+dist/
