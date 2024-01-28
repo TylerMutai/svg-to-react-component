@@ -4,6 +4,7 @@ import path from "path";
 import stringRepresentation from "../../pages/Blueprints/ReactComponentTypescriptBlueprint";
 import { ZipAFolder } from "zip-a-folder";
 import { crypto } from "next/dist/compiled/@edge-runtime/primitives";
+import { cleanString, mockPromisesAllImplementation } from "../helpers/general";
 
 const placeholderKey = "bazengaDaddy";
 const placeholderValue = "bazengaMammi";
@@ -20,7 +21,8 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
       });
     });
   }
-  await Promise.all(promises);
+
+  await mockPromisesAllImplementation(promises);
   const parsedSVGs: string[] = [];
   const parsedSVGsPromises: (() => Promise<void>)[] = [];
   for (const s of stringSVGs) {
@@ -54,18 +56,15 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
           .stringify(t)
           .replace(`${placeholderKey}="${placeholderValue}"`, "{...props}"),
       );
-      return new Promise((resolve) => {
-        resolve();
-      });
     });
   }
-  console.log("parsedSVGsPromises: ", parsedSVGsPromises);
-  await Promise.all(parsedSVGsPromises);
+
+  await mockPromisesAllImplementation(parsedSVGsPromises);
   console.log("parsedSVGs: ", parsedSVGs);
+  console.log("\n\n\n\n\n\n");
   return await createFileResponse(language, parsedSVGs);
 };
 
-const cleanString = (s: string) => s.replace(/\s+/g, " ").trim();
 const retryIncrementValue = 10000; // 10 seconds.
 const maxRetryIncrement = 100000; // 100 seconds.
 /**
