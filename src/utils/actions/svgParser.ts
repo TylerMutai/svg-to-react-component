@@ -1,13 +1,12 @@
-import svgson from "svgson";
 import fs from "fs";
 import path from "path";
 import stringRepresentation from "../../pages/Blueprints/ReactComponentTypescriptBlueprint";
 import { ZipAFolder } from "zip-a-folder";
 import { crypto } from "next/dist/compiled/@edge-runtime/primitives";
-import { cleanString, mockPromisesAllImplementation } from "../helpers/general";
+import { cleanString, runAllPromises } from "../helpers/general";
 
-const placeholderKey = "bazengaDaddy";
-const placeholderValue = "bazengaMammi";
+const placeholderKey = "placeholderKey";
+const placeholderValue = "placeholderValue";
 
 export const svgParser = async (language: "ts" | "js", files: File[]) => {
   const promises: (() => Promise<void>)[] = [];
@@ -16,52 +15,55 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
     promises.push(async () => {
       const text = await file.text();
       stringSVGs.push(text);
-      return new Promise((resolve) => {
-        resolve();
-      });
     });
   }
 
-  await mockPromisesAllImplementation(promises);
+  await runAllPromises(promises);
   const parsedSVGs: string[] = [];
   const parsedSVGsPromises: (() => Promise<void>)[] = [];
-  for (const s of stringSVGs) {
-    parsedSVGsPromises.push(async () => {
-      const t = await svgson.parse(s, {
-        camelcase: true,
-        transformNode: (node) => {
-          const nodeCopy = { ...node };
-          if (nodeCopy.name === "svg") {
-            nodeCopy.attributes[placeholderKey] = placeholderValue;
-          }
-          if (nodeCopy.attributes.fill) {
-            if (nodeCopy.attributes.fill !== "none") {
-              nodeCopy.attributes.fill = "currentColor";
-            }
-          }
 
-          if (nodeCopy.attributes.stroke) {
-            if (nodeCopy.attributes.stroke !== "none") {
-              nodeCopy.attributes.stroke = "currentColor";
+  for (const s of stringSVGs) {
+    const __sCopy = `${s}`;
+    parsedSVGsPromises.push(async () => {
+      const _sCopy = `${__sCopy}`;
+      const svgson = await import("svgson");
+      try {
+        const t = await svgson.parse(_sCopy, {
+          camelcase: true,
+          transformNode: (node) => {
+            const nodeCopy = { ...node };
+            if (nodeCopy.name === "svg") {
+              nodeCopy.attributes[placeholderKey] = placeholderValue;
             }
-          }
-          if (nodeCopy.attributes.strokeWidth) {
-            nodeCopy.attributes.strokeWidth = "props.strokeWidth || 1.5";
-          }
-          return nodeCopy;
-        },
-      });
-      parsedSVGs.push(
-        svgson
-          .stringify(t)
-          .replace(`${placeholderKey}="${placeholderValue}"`, "{...props}"),
-      );
+            if (nodeCopy.attributes.fill) {
+              if (nodeCopy.attributes.fill !== "none") {
+                nodeCopy.attributes.fill = "currentColor";
+              }
+            }
+
+            if (nodeCopy.attributes.stroke) {
+              if (nodeCopy.attributes.stroke !== "none") {
+                nodeCopy.attributes.stroke = "currentColor";
+              }
+            }
+            if (nodeCopy.attributes.strokeWidth) {
+              nodeCopy.attributes.strokeWidth = "props.strokeWidth || 1.5";
+            }
+            return nodeCopy;
+          },
+        });
+        parsedSVGs.push(
+          svgson
+            .stringify(t)
+            .replace(`${placeholderKey}="${placeholderValue}"`, "{...props}"),
+        );
+      } catch (e) {
+        console.log("An error occured parsing the SVG files. ", e);
+      }
     });
   }
 
-  await mockPromisesAllImplementation(parsedSVGsPromises);
-  console.log("parsedSVGs: ", parsedSVGs);
-  console.log("\n\n\n\n\n\n");
+  await runAllPromises(parsedSVGsPromises);
   return await createFileResponse(language, parsedSVGs);
 };
 
@@ -149,8 +151,7 @@ export const createFileResponse = async (
     return {
       status: false,
       message: cleanString(
-        `Hear me out. Turns out the operation failed. If you are brave enough, re-try the request. I have a 
-          gut feeling it won't fail this time. Be brave. Here's more information about what happened: 
+        `An error occurred: 
           ${m} - ${performCleanup(destinationPath)}
           `,
       ),
@@ -161,8 +162,9 @@ export const createFileResponse = async (
   const promises: (() => Promise<void>)[] = [];
   const errors: string[] = [];
   for (let i = 0; i < svgStrings.length; i++) {
-    const svg = svgStrings[i];
+    const _svg = svgStrings[i];
     promises.push(() => {
+      const svg = `${_svg}`;
       return new Promise((resolve) => {
         try {
           const iconName = `IconComponent${i}`;
@@ -170,12 +172,13 @@ export const createFileResponse = async (
           const data = new Uint8Array(
             Buffer.from(stringRepresentation(iconName, svg)),
           );
-          console.info(cleanString(`Writing file: ${iconFileName}`));
-          fs.writeFileSync(``, data);
-          console.info(`File ${iconFileName} written successfully.`);
+          const dest = path.join(destinationPath, iconFileName);
+          console.info(cleanString(`Writing file: ${dest}`));
+          fs.writeFileSync(dest, data);
+          console.info(`File ${dest} written successfully.`);
         } catch (e) {
           const m = cleanString(
-            `We run into an issue with writing file [${svg}]. Error: \n ${JSON.stringify(e)}\n `,
+            `We run into an issue with writing file. Error: \n ${JSON.stringify(e)}\n `,
           );
           console.error(m);
           errors.push(m);
@@ -185,7 +188,7 @@ export const createFileResponse = async (
     });
   }
 
-  await Promise.all(promises);
+  await runAllPromises(promises);
   if (errors.length) {
     const m = cleanString(
       `Failure rate was ${Math.ceil(((svgStrings.length + 1) / (errors.length + 1)) * 100)}%. Aborting. Errors: ${errors.join("; \n")}`,

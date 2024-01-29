@@ -40,7 +40,7 @@ function LandingPage() {
             <div className="absolute w-full h-full left-0 top-0 bg-[rgba(255,255,255,.7)]" />
             <div className="flex flex-col gap-8 z-50 justify-center items-center">
               <h1 className="text-center whitespace-wrap font-bold">
-                Convert your SVG components to stateful React components.
+                Convert your SVG images to stateful React components.
               </h1>
               <p className="text-center whitespace-wrap">
                 What does this mean? Simple. You can now use your SVG images

@@ -1,13 +1,11 @@
 export const cleanString = (s: string) => s.replace(/\s+/g, " ").trim();
 
 /**
- * I really want to get this blog out. So I won't drown myself in documentation on how [Promise.all] should work.
- * This is a mock implementation. Don't judge me.
+ * A wrapper function that runs a list of async functions concurrently and only returns when
+ * all promises complete.
+ * @param promises an iterable like an array with a list of async functions
  */
-
-export const mockPromisesAllImplementation = (
-  promises: (() => Promise<any>)[],
-) => {
+export const runAllPromises = (promises: (() => Promise<any>)[]) => {
   return new Promise<void>((resolve) => {
     let _queue = new Set();
 
@@ -17,14 +15,12 @@ export const mockPromisesAllImplementation = (
     }
 
     // We'll simulate the locking process with this. We don't want our [_queue] being mutated concurrently
-    // then end up with stale data.
+    // then end up with an inconsistent state.
     let _lock = false;
 
     // This will be called by every async function when they complete.
     const _cleanup = (idx: number, isError?: boolean) => {
-      // pause execution as long as a 'thread' is accessing our [_queue]. 'Thread' is in quotes since we know
-      // that javascript runs an event loop on the main thread (making it single threaded) and the illusion of pure
-      // concurrency arises from time slot sharing done by the event loop.
+      // pause execution as long as a 'thread' is accessing our [_queue].
       console.info(
         `Cleanup called by child from ${isError ? "catch" : "then"}: [${idx}]. Queue length: [${_queue.size}].`,
       );
