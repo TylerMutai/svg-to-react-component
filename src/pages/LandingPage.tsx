@@ -37,7 +37,7 @@ function LandingPage() {
         <div className="flex flex-col gap-8 h-[100vh] p-10 w-full overflow-auto bg-blue-100 items-center justify-center">
           <div className="h-[200px] flex-shrink-0 flex-grow-0" />
           <div className="flex flex-col gap-8 p-10 my-10 flex-shrink-0 flex-grow-1 shadow-lg relative w-[80%] lg:w-[65%] xl:w-[50%] items-center justify-center">
-            <div className="absolute w-full h-full left-0 top-0 bg-[rgba(255,255,255,.7)]" />
+            <div className="absolute w-full h-full left-0 top-0 bg-[rgba(255,255,255,.9)]" />
             <div className="flex flex-col gap-8 z-50 justify-center items-center">
               <h1 className="text-center whitespace-wrap font-bold">
                 Convert your SVG images to stateful React components.

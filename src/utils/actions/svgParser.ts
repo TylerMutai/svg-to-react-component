@@ -4,9 +4,11 @@ import stringRepresentation from "../../pages/Blueprints/ReactComponentTypescrip
 import { ZipAFolder } from "zip-a-folder";
 import { crypto } from "next/dist/compiled/@edge-runtime/primitives";
 import { cleanString, runAllPromises } from "../helpers/general";
+import * as process from "process";
 
 const placeholderKey = "placeholderKey";
 const placeholderValue = "placeholderValue";
+const rootDirectory = path.join(process.cwd());
 
 export const svgParser = async (language: "ts" | "js", files: File[]) => {
   const promises: (() => Promise<void>)[] = [];
@@ -123,13 +125,13 @@ export const createFileResponse = async (
   const nums = crypto.getRandomValues(array);
   const directoryName = `${new Date().getTime()}${nums[0]}${nums[1]}`;
   const destination = `temp/${directoryName}`;
-  const destinationPath = path.join("./", destination);
+  const destinationPath = path.join(rootDirectory, destination);
   const destinationUtilsPath = path.join(destinationPath, "utils");
 
   // copy boilerplate
   try {
-    const p = `utils/${language}/`;
-    const files = fs.readdirSync(path.join("./", p));
+    const p = path.join(rootDirectory, `utils/${language}/`);
+    const files = fs.readdirSync(p);
     console.info(
       `Successfully read files in '${p}'. Starting the copying process.\n`,
     );
@@ -142,7 +144,7 @@ export const createFileResponse = async (
     }
     for (const f of files) {
       const source = path.join(p, f);
-      const dest = path.join(path.join(destinationPath, "utils"), f);
+      const dest = path.join(destinationUtilsPath, f);
       console.info(`Copying file ${f} from ${source} to ${dest}`);
       fs.copyFileSync(source, dest);
       console.info(`Copying file ${f} from ${source} to ${dest} successful.`);
@@ -192,8 +194,6 @@ export const createFileResponse = async (
     });
   }
 
-  const _extraM = performCleanup(destinationPath);
-
   await runAllPromises(promises);
   if (errors.length) {
     const m = cleanString(
@@ -201,11 +201,9 @@ export const createFileResponse = async (
     );
     return {
       status: false,
-      message: `${m} - ${_extraM}`,
+      message: `${m} - ${performCleanup(destinationPath)}`,
     };
   }
-
-  //
 
   try {
     const zipFileName = `jsd-${directoryName}.zip`;
@@ -215,7 +213,7 @@ export const createFileResponse = async (
     console.info(
       `File copying complete. Files generated successfully. Zipping folder to [${zipFilePath}].`,
     );
-
+    performCleanup(destinationPath);
     return {
       status: true,
       message: "Files generated successfully.",

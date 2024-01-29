@@ -54,6 +54,6 @@
     "utils/js/*.jsx",
     "utils/ts/*.ts",
     "utils/ts/*.tsx",
-    "temp/**/*"
+    "src/app/api/file/generated/temp/**/*"
   ]
 }
