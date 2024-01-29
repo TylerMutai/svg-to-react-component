@@ -13,6 +13,7 @@ const nextConfig = {
           patterns: [
             {
               from: "utils/**/*",
+              to: "../",
               info: { minimized: true },
             },
           ],
