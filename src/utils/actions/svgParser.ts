@@ -124,7 +124,7 @@ export const createFileResponse = async (
   const array = new Uint8Array(2);
   const nums = crypto.getRandomValues(array);
   const directoryName = `${new Date().getTime()}${nums[0]}${nums[1]}`;
-  const destination = `temp/${directoryName}`;
+  const destination = `./temp/${directoryName}`;
   const destinationPath = path.join(destination);
   const destinationUtilsPath = path.join(destinationPath, "utils");
 
