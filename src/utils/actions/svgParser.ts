@@ -121,6 +121,7 @@ export const createFileResponse = async (
   const directoryName = `${new Date().getTime()}${nums[0]}${nums[1]}`;
   const destination = `temp/${directoryName}`;
   const destinationPath = path.join("./", destination);
+  const destinationUtilsPath = path.join(destinationPath, "utils");
 
   // copy boilerplate
   try {
@@ -130,15 +131,15 @@ export const createFileResponse = async (
       `Successfully read files in '${p}'. Starting the copying process.\n`,
     );
 
-    if (!fs.existsSync(destinationPath)) {
+    if (!fs.existsSync(destinationUtilsPath)) {
       console.info(
-        `Destination path ${destinationPath} doesn't exist. Creating directory now.`,
+        `Destination path ${destinationUtilsPath} doesn't exist. Creating directory now.`,
       );
-      fs.mkdirSync(destinationPath, { recursive: true });
+      fs.mkdirSync(destinationUtilsPath, { recursive: true });
     }
     for (const f of files) {
       const source = path.join(p, f);
-      const dest = path.join(destinationPath, f);
+      const dest = path.join(path.join(destinationPath, "utils"), f);
       console.info(`Copying file ${f} from ${source} to ${dest}`);
       fs.copyFileSync(source, dest);
       console.info(`Copying file ${f} from ${source} to ${dest} successful.`);
