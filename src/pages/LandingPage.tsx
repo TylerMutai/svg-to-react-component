@@ -43,11 +43,11 @@ function LandingPage() {
                 Convert your SVG images to stateful React components.
               </h1>
               <p className="text-center whitespace-wrap">
-                What does this mean? Simple. You can now use your SVG images
-                like actual icons. Want a different color on hover not just on
-                the text, but also your SVG image? Want a particular scaling
-                transition? Want balzingly fast initial loads? Then you
-                definitely are in the right place!
+                This tool simplifies the conversion of SVG images into React
+                components, catering to developers seeking dynamic hover
+                effects, scaling transitions, or improved load times. It's a
+                straightforward solution for enhancing your project's visuals
+                and performance.
               </p>
               <CustomFileInput name={"files"} />
               <div className="flex flex-col gap-3">

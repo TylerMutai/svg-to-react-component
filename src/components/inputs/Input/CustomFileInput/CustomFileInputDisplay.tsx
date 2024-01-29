@@ -44,11 +44,8 @@ const CustomFileInputDisplay = ({
         ))
       ) : (
         <div className="flex flex-row items-center w-full h-full">
-          <p className="text-center">
-            Uploaded files shall, and will appear here. Otherwise what's my
-            purpose? Why do I exist? Why does anything exist though? Why all
-            these redundant letters in 'queue' just to say 'Q'? Why not
-            'randevoooo' instead of 'rendezvous'? Why not 'rendezvas' then?
+          <p className="text-center p-5 border border-gray-500 border-dashed rounded-[10px] w-full">
+            No uploaded files yet.
           </p>
         </div>
       )}

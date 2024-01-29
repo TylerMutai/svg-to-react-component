@@ -32,22 +32,21 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
           camelcase: true,
           transformNode: (node) => {
             const nodeCopy = { ...node };
-            if (nodeCopy.name === "svg") {
-              nodeCopy.attributes[placeholderKey] = placeholderValue;
-            }
-            if (nodeCopy.attributes.fill) {
-              if (nodeCopy.attributes.fill !== "none") {
-                nodeCopy.attributes.fill = "currentColor";
-              }
-            }
+            nodeCopy.attributes[placeholderKey] = placeholderValue;
 
-            if (nodeCopy.attributes.stroke) {
-              if (nodeCopy.attributes.stroke !== "none") {
-                nodeCopy.attributes.stroke = "currentColor";
+            for (const child of nodeCopy.children) {
+              if (child.attributes.fill !== "none") {
+                child.attributes.fill = "currentColor";
               }
-            }
-            if (nodeCopy.attributes.strokeWidth) {
-              nodeCopy.attributes.strokeWidth = "props.strokeWidth || 1.5";
+              if (child.attributes.stroke) {
+                if (child.attributes.stroke !== "none") {
+                  child.attributes.stroke = "currentColor";
+                }
+              }
+              console.log("CHILD ATTRIBUTES: ", child.attributes);
+              if (child.attributes["stroke-width"]) {
+                child.attributes["stroke-width"] = "{props.strokeWidth || 1.5}";
+              }
             }
             return nodeCopy;
           },
@@ -55,10 +54,14 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
         parsedSVGs.push(
           svgson
             .stringify(t)
-            .replace(`${placeholderKey}="${placeholderValue}"`, "{...props}"),
+            .replace(`${placeholderKey}="${placeholderValue}"`, "{...props}")
+            .replaceAll(
+              `strokeWidth="{props.strokeWidth || 1.5}"`,
+              `strokeWidth={props.strokeWidth || 1.5}`,
+            ),
         );
       } catch (e) {
-        console.log("An error occured parsing the SVG files. ", e);
+        console.log("An error occurred parsing the SVG files. ", e);
       }
     });
   }

@@ -64,15 +64,7 @@ const CustomFileInput: FC<CustomFileInputProps> = ({
             <span className="text-inherit font-normal">Supported formats:</span>
             <span className="text-inherit font-normal !text-primary-color-1000">
               {" "}
-              SVG -{" "}
-              <span className="text-[14px] font-italic">
-                {" "}
-                I'll have to be a dictator here, so SVGs only. If you wanted to
-                upload something else, well, touche. An alternative though, just
-                upload an SVG. An even better alternative, don't upload anything
-                that isn't an SVG. An even best alternative, turn off your
-                computer and go bond with your family :-)
-              </span>
+              SVG
             </span>
           </p>
         </div>
