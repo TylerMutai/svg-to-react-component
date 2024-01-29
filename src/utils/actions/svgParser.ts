@@ -213,7 +213,6 @@ export const createFileResponse = async (
     console.info(
       `File copying complete. Files generated successfully. Zipping folder to [${zipFilePath}].`,
     );
-    performCleanup(destinationPath);
     return {
       status: true,
       message: "Files generated successfully.",
