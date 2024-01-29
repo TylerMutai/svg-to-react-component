@@ -3,13 +3,14 @@
 import React from "react";
 import {
   Control,
+  FieldValues,
   UseFormGetValues,
   UseFormRegister,
   UseFormSetValue,
   UseFormWatch,
 } from "react-hook-form";
 
-interface FormContextProps<T> {
+interface FormContextProps<T extends FieldValues> {
   initialValues: Record<string, T>;
   errors?: { [key: string]: string[] };
   register: UseFormRegister<T>;

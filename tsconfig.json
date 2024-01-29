@@ -20,7 +20,6 @@
     "jsx": "preserve",
     "incremental": true,
     "types": [
-      "jest",
       "node"
     ],
     "baseUrl": "./src",
@@ -47,13 +46,13 @@
     "**/*.ts",
     "**/*.tsx",
     "types.d.ts",
-    "jest.setup.js",
     ".next/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "cypress",
     "cypress.config.ts",
-    "utils"
+    "utils",
+    "temp"
   ]
 }
