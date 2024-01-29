@@ -192,6 +192,8 @@ export const createFileResponse = async (
     });
   }
 
+  const _extraM = performCleanup(destinationPath);
+
   await runAllPromises(promises);
   if (errors.length) {
     const m = cleanString(
@@ -199,7 +201,7 @@ export const createFileResponse = async (
     );
     return {
       status: false,
-      message: `${m} - ${performCleanup(destinationPath)}`,
+      message: `${m} - ${_extraM}`,
     };
   }
 

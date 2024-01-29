@@ -50,9 +50,10 @@
   ],
   "exclude": [
     "node_modules",
-    "cypress",
-    "cypress.config.ts",
-    "utils",
-    "temp"
+    "utils/js/*.js",
+    "utils/js/*.jsx",
+    "utils/ts/*.ts",
+    "utils/ts/*.tsx",
+    "temp/**/*"
   ]
 }
