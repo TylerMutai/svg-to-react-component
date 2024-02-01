@@ -170,7 +170,7 @@ export const createFileResponse = async (
       status: false,
       message: cleanString(
         `An error occurred: 
-          ${m} - ${performCleanup(mainDestinationPath)}
+          ${m} - ${performCleanup(mainDestinationPath)} - ${performCleanup(tempZipDestinationDirectory)}
           `,
       ),
     };
