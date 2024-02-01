@@ -10,6 +10,19 @@ const placeholderKey = "placeholderKey";
 const placeholderValue = "placeholderValue";
 const rootDirectory = path.join(process.cwd());
 
+const tempZipDestinationDirectory = path.join(rootDirectory, "temp-zip");
+// This represents the temporary directory where our generated files will live.
+const tempDestinationDirectory = (dir: string) =>
+  path.join(rootDirectory, "temp", dir);
+
+// This represents the temporary directory where we'll copy the utility files required by generated files.
+const utilsDestinationDirectory = (dir: string) =>
+  path.join(tempDestinationDirectory(dir), "utils");
+
+// This represents the directory with the utility files that we'll copy to the generated directories.
+const utilsSourceDirectory = (language: string) =>
+  path.join(rootDirectory, "utils", language);
+
 export const svgParser = async (language: "ts" | "js", files: File[]) => {
   const promises: (() => Promise<void>)[] = [];
   const stringSVGs: string[] = [];
@@ -124,16 +137,15 @@ export const createFileResponse = async (
   const array = new Uint8Array(2);
   const nums = crypto.getRandomValues(array);
   const directoryName = `${new Date().getTime()}${nums[0]}${nums[1]}`;
-  const destination = `./temp/${directoryName}`;
-  const destinationPath = path.join(destination);
-  const destinationUtilsPath = path.join(destinationPath, "utils");
+  const mainDestinationPath = tempDestinationDirectory(directoryName);
+  const destinationUtilsPath = utilsDestinationDirectory(directoryName);
+  const sourceUtilsPath = utilsSourceDirectory(language);
 
   // copy boilerplate
   try {
-    const p = path.join(rootDirectory, `utils/${language}/`);
-    const files = fs.readdirSync(p);
+    const files = fs.readdirSync(sourceUtilsPath);
     console.info(
-      `Successfully read files in '${p}'. Starting the copying process.\n`,
+      `Successfully read files in '${sourceUtilsPath}'. Starting the copying process.\n`,
     );
 
     if (!fs.existsSync(destinationUtilsPath)) {
@@ -143,7 +155,7 @@ export const createFileResponse = async (
       fs.mkdirSync(destinationUtilsPath, { recursive: true });
     }
     for (const f of files) {
-      const source = path.join(p, f);
+      const source = path.join(sourceUtilsPath, f);
       const dest = path.join(destinationUtilsPath, f);
       console.info(`Copying file ${f} from ${source} to ${dest}`);
       fs.copyFileSync(source, dest);
@@ -158,13 +170,13 @@ export const createFileResponse = async (
       status: false,
       message: cleanString(
         `An error occurred: 
-          ${m} - ${performCleanup(destinationPath)}
+          ${m} - ${performCleanup(mainDestinationPath)}
           `,
       ),
     };
   }
 
-  // for each SVG, create an equivalent file in the [destinationPath] directory.
+  // for each SVG, create an equivalent file in the [tempDestinationDirectory] directory.
   const promises: (() => Promise<void>)[] = [];
   const errors: string[] = [];
   for (let i = 0; i < svgStrings.length; i++) {
@@ -178,7 +190,7 @@ export const createFileResponse = async (
           const data = new Uint8Array(
             Buffer.from(stringRepresentation(iconName, svg)),
           );
-          const dest = path.join(destinationPath, iconFileName);
+          const dest = path.join(mainDestinationPath, iconFileName);
           console.info(cleanString(`Writing file: ${dest}`));
           fs.writeFileSync(dest, data);
           console.info(`File ${dest} written successfully.`);
@@ -201,23 +213,27 @@ export const createFileResponse = async (
     );
     return {
       status: false,
-      message: `${m} - ${performCleanup(destinationPath)}`,
+      message: `${m} - ${performCleanup(mainDestinationPath)}`,
     };
   }
 
   try {
     const zipFileName = `jsd-${directoryName}.zip`;
-    const zipFilePath = path.join("temp/", zipFileName);
-    console.log("zipFilePath", zipFilePath);
-    await ZipAFolder.zip(destinationPath, zipFilePath, {});
+    const zipDestinationPath = path.join(
+      tempZipDestinationDirectory,
+      zipFileName,
+    );
+    console.log("Generating zip file at zipFilePath: ", zipDestinationPath);
+    await ZipAFolder.zip(mainDestinationPath, zipDestinationPath, {});
     console.info(
-      `File copying complete. Files generated successfully. Zipping folder to [${zipFilePath}].`,
+      `File copying complete. Files generated successfully. 
+      Zipping folder [${mainDestinationPath}] to [${zipDestinationPath}].zip.`,
     );
     // TODO: Handle cleanup even after success.
     return {
       status: true,
-      message: "Files generated successfully.",
-      zipFilePath: zipFilePath,
+      message: "Zip file generated successfully. Initiating download.",
+      zipFilePath: zipDestinationPath,
     };
   } catch (e) {
     const m = cleanString(
@@ -225,7 +241,7 @@ export const createFileResponse = async (
     );
     return {
       status: false,
-      message: `${m} - ${performCleanup(destinationPath)}`,
+      message: `${m} - ${performCleanup(mainDestinationPath)}`,
     };
   }
 };

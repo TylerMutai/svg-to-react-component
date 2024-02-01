@@ -16,6 +16,11 @@ const nextConfig = {
               to: "../",
               info: { minimized: true },
             },
+            {
+              from: "config/**/*",
+              to: "../",
+              info: { minimized: true },
+            },
           ],
         }),
       );
