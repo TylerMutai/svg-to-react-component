@@ -5,15 +5,14 @@ import { ZipAFolder } from "zip-a-folder";
 import { crypto } from "next/dist/compiled/@edge-runtime/primitives";
 import { cleanString, runAllPromises } from "../helpers/general";
 import * as process from "process";
+import { performCleanup } from "./performCleanup";
 
 const placeholderKey = "placeholderKey";
 const placeholderValue = "placeholderValue";
 const rootDirectory = path.join(process.cwd());
-
-const tempZipDestinationDirectory = path.join(rootDirectory, "temp-zip");
 // This represents the temporary directory where our generated files will live.
-const tempDestinationDirectory = (dir: string) =>
-  path.join(rootDirectory, "temp", dir);
+const tempDestinationDirectory = (dir?: string) =>
+  path.join(rootDirectory, "temp", dir || "");
 
 // This represents the temporary directory where we'll copy the utility files required by generated files.
 const utilsDestinationDirectory = (dir: string) =>
@@ -85,51 +84,6 @@ export const svgParser = async (language: "ts" | "js", files: File[]) => {
   return await createFileResponse(language, parsedSVGs);
 };
 
-const retryIncrementValue = 10000; // 10 seconds.
-const maxRetryIncrement = 100000; // 100 seconds.
-/**
- * @param destinationPath the path to prune.
- * This function will run indefinitely if it runs into any errors until pruning is successful.
- * We'll increment the value of [retryDelay] by [retryIncrementValue] on every failure until a threshold total of
- * [maxRetryIncrement] where now the function will retry in equal intervals until cleanup is successful.
- *
- * Meanwhile, we'll return immediately with an error after the first try if an error occurs
- * so that the user doesn't get agitated.
- * @param retryDelay
- * @param totalRetries
- */
-const performCleanup = (
-  destinationPath: string,
-  retryDelay = 1000,
-  totalRetries = 0,
-): { status: boolean; message: string } => {
-  console.info(
-    cleanString(`Pruning path '${destinationPath}'. 
-      The retry delay is: [${retryDelay}]. We so far have retried this operation: [${totalRetries}] times.`),
-  );
-  try {
-    if (fs.existsSync(destinationPath)) {
-      console.info(cleanString(`Destination exists. Attempting to delete it.`));
-      fs.rmSync(destinationPath, { recursive: true });
-    }
-  } catch (e) {
-    const m = JSON.stringify(e);
-    console.error(
-      cleanString(
-        `An error: \n ${m} \n occurred. Current total delay: [${retryDelay}]. Current total retries: 
-        [${totalRetries}].`,
-      ),
-    );
-    const rDelay = retryDelay + retryIncrementValue;
-    const _rDelay = rDelay >= maxRetryIncrement ? maxRetryIncrement : rDelay;
-    setTimeout(
-      () => performCleanup(destinationPath, _rDelay, totalRetries + 1),
-      _rDelay,
-    );
-    return { status: false, message: m };
-  }
-  return { status: true, message: "Cleanup operation was successful." };
-};
 export const createFileResponse = async (
   language: "ts" | "js",
   svgStrings: string[],
@@ -170,7 +124,7 @@ export const createFileResponse = async (
       status: false,
       message: cleanString(
         `An error occurred: 
-          ${m} - ${performCleanup(mainDestinationPath)} - ${performCleanup(tempZipDestinationDirectory)}
+          ${m} - ${performCleanup(mainDestinationPath)}
           `,
       ),
     };
@@ -220,16 +174,16 @@ export const createFileResponse = async (
   try {
     const zipFileName = `jsd-${directoryName}.zip`;
     const zipDestinationPath = path.join(
-      tempZipDestinationDirectory,
+      tempDestinationDirectory(),
       zipFileName,
     );
     console.log("Generating zip file at zipFilePath: ", zipDestinationPath);
     await ZipAFolder.zip(mainDestinationPath, zipDestinationPath, {});
     console.info(
       `File copying complete. Files generated successfully. 
-      Zipping folder [${mainDestinationPath}] to [${zipDestinationPath}].zip.`,
+      Zipping folder [${mainDestinationPath}] to [${zipDestinationPath}].`,
     );
-    // TODO: Handle cleanup even after success.
+
     return {
       status: true,
       message: "Zip file generated successfully. Initiating download.",
